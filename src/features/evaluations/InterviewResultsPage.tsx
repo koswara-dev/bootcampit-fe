@@ -15,11 +15,11 @@ interface Evaluation {
 }
 
 const mockEvaluations: Evaluation[] = [
-  { id: '1', candidateName: 'Alex Johnson', avgScore: 88, status: 'Lolos', lastEvaluator: 'Marcus Chen', date: '12 Mar 2024' },
-  { id: '2', candidateName: 'Maria Garcia', avgScore: 92, status: 'Lolos', lastEvaluator: 'Sarah Smith', date: '11 Mar 2024' },
-  { id: '3', candidateName: 'James Smith', avgScore: 45, status: 'Tidak Lolos', lastEvaluator: 'Marcus Chen', date: '10 Mar 2024' },
-  { id: '4', candidateName: 'Sarah Connor', avgScore: 0, status: 'Menunggu', lastEvaluator: '-', date: '13 Mar 2024' },
-  { id: '5', candidateName: 'Chen Wei', avgScore: 78, status: 'Lolos', lastEvaluator: 'David Lee', date: '09 Mar 2024' },
+  { id: '1', candidateName: 'Alex Johnson', avgScore: 88, status: 'Lolos', lastEvaluator: 'Marcus Chen', date: '12 Mar 2026' },
+  { id: '2', candidateName: 'Maria Garcia', avgScore: 92, status: 'Lolos', lastEvaluator: 'Sarah Smith', date: '11 Mar 2026' },
+  { id: '3', candidateName: 'James Smith', avgScore: 45, status: 'Tidak Lolos', lastEvaluator: 'Marcus Chen', date: '10 Mar 2026' },
+  { id: '4', candidateName: 'Sarah Connor', avgScore: 0, status: 'Menunggu', lastEvaluator: '-', date: '13 Mar 2026' },
+  { id: '5', candidateName: 'Chen Wei', avgScore: 78, status: 'Lolos', lastEvaluator: 'David Lee', date: '09 Mar 2026' },
 ];
 
 export default function InterviewResultsPage() {

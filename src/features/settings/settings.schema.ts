@@ -25,6 +25,16 @@ export const integrationSchema = z.object({
   geminiModel: z.string().min(1, "Model Gemini wajib diisi"),
 });
 
+export const passwordSchema = z.object({
+  currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
+  newPassword: z.string().min(6, "Password baru minimal 6 karakter"),
+  confirmPassword: z.string().min(6, "Konfirmasi password minimal 6 karakter")
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Konfirmasi password tidak cocok",
+  path: ["confirmPassword"],
+});
+
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 export type SystemFormValues = z.infer<typeof systemSchema>;
 export type IntegrationFormValues = z.infer<typeof integrationSchema>;
+export type PasswordFormValues = z.infer<typeof passwordSchema>;

@@ -1,15 +1,33 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Settings, Save, Lock, Bell, Globe, Database, ShieldCheck, Mail, Camera, Link, MessageCircle, Bot, AtSign } from "lucide-react";
+import { User, Settings, Save, Lock, Bell, Globe, Database, ShieldCheck, Mail, Camera, Link, MessageCircle, Bot, AtSign, KeyRound, Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "@/app/store/auth.store";
-import { profileSchema, systemSchema, integrationSchema } from "./settings.schema";
-import type { ProfileFormValues, SystemFormValues, IntegrationFormValues } from "./settings.schema";
+import { profileSchema, systemSchema, integrationSchema, passwordSchema } from "./settings.schema";
+import type { ProfileFormValues, SystemFormValues, IntegrationFormValues, PasswordFormValues } from "./settings.schema";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {
   const user = useAuthStore((state) => state.user);
-  const [activeTab, setActiveTab] = useState<"profile" | "system" | "integration">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "system" | "integration" | "security" | "notification">("profile");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Notification toggles
+  const [notif, setNotif] = useState({
+    emailNewSiswa: true,
+    emailPayment: true,
+    emailWeeklyReport: false,
+    waScheduleReminder: true,
+    waAttendance: false,
+    waPaymentGateway: true,
+    inAppSystem: true,
+    inAppFeedback: true,
+    inAppAnnouncement: false,
+  });
+  const toggleNotif = (key: keyof typeof notif) =>
+    setNotif((prev) => ({ ...prev, [key]: !prev[key] }));
   const isAdmin = user?.role === "ADMIN";
 
   // Profile Form
@@ -61,6 +79,17 @@ export default function SettingsPage() {
     },
   });
 
+  // Password Form
+  const {
+    register: regPassword,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+    formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
+  } = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+  });
+
+
   const onProfileSave = (data: ProfileFormValues) => {
     console.log("Profile data saved:", data);
     toast.success("Profil Anda berhasil diperbarui!");
@@ -82,6 +111,12 @@ export default function SettingsPage() {
     }
     console.log("Integration data saved:", data);
     toast.success("Pengaturan integrasi API berhasil disimpan!");
+  };
+
+  const onPasswordSave = (data: PasswordFormValues) => {
+    console.log("Password change submitted:", data);
+    toast.success("Password berhasil diubah!");
+    resetPassword();
   };
 
   return (
@@ -138,11 +173,25 @@ export default function SettingsPage() {
           
           <div className="h-px bg-[#3b3127] my-4 mx-4"></div>
           
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-[#29221b] transition-all">
+          <button
+            onClick={() => setActiveTab("notification")}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "notification"
+                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
+                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
+            }`}
+          >
             <Bell className="w-5 h-5" />
             Notifikasi
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-[#29221b] transition-all">
+          <button
+            onClick={() => setActiveTab("security")}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "security"
+                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
+                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
+            }`}
+          >
             <ShieldCheck className="w-5 h-5" />
             Keamanan
           </button>
@@ -305,7 +354,7 @@ export default function SettingsPage() {
                 </div>
               </form>
             </div>
-          ) : (
+          ) : activeTab === "integration" ? (
             <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden relative">
               {!isAdmin && (
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-8 text-center">
@@ -408,7 +457,241 @@ export default function SettingsPage() {
                 </div>
               </form>
             </div>
-          )}
+          ) : activeTab === "security" ? (
+            <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden">
+              <div className="p-6 border-b border-[#3b3127] bg-[#3b3127]/20">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <KeyRound className="w-5 h-5 text-[#ef6c00]" /> Ubah Password
+                </h3>
+                <p className="text-gray-400 text-xs mt-1">Pastikan menggunakan password yang kuat dan tidak mudah ditebak.</p>
+              </div>
+
+              <form onSubmit={handlePasswordSubmit(onPasswordSave)} className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Left: Password Fields */}
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-300">Password Saat Ini</label>
+                      <div className="relative">
+                        <input
+                          {...regPassword("currentPassword")}
+                          type={showCurrent ? "text" : "password"}
+                          className="w-full bg-[#1f1a14] border border-[#3b3127] rounded-xl px-4 py-3 pr-11 text-white focus:outline-none focus:ring-1 focus:ring-[#ef6c00] transition"
+                          placeholder="Masukkan password saat ini"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrent(!showCurrent)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition"
+                        >
+                          {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {passwordErrors.currentPassword && <p className="text-red-500 text-xs">{passwordErrors.currentPassword.message}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-300">Password Baru</label>
+                      <div className="relative">
+                        <input
+                          {...regPassword("newPassword")}
+                          type={showNew ? "text" : "password"}
+                          className="w-full bg-[#1f1a14] border border-[#3b3127] rounded-xl px-4 py-3 pr-11 text-white focus:outline-none focus:ring-1 focus:ring-[#ef6c00] transition"
+                          placeholder="Minimal 6 karakter"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNew(!showNew)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition"
+                        >
+                          {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {passwordErrors.newPassword && <p className="text-red-500 text-xs">{passwordErrors.newPassword.message}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-300">Konfirmasi Password Baru</label>
+                      <div className="relative">
+                        <input
+                          {...regPassword("confirmPassword")}
+                          type={showConfirm ? "text" : "password"}
+                          className="w-full bg-[#1f1a14] border border-[#3b3127] rounded-xl px-4 py-3 pr-11 text-white focus:outline-none focus:ring-1 focus:ring-[#ef6c00] transition"
+                          placeholder="Ulangi password baru"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(!showConfirm)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition"
+                        >
+                          {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {passwordErrors.confirmPassword && <p className="text-red-500 text-xs">{passwordErrors.confirmPassword.message}</p>}
+                    </div>
+                  </div>
+
+                  {/* Right: Requirements + Save Button */}
+                  <div className="flex flex-col justify-between gap-6">
+                    <div className="p-4 bg-[#1f1a14] border border-[#3b3127]/50 rounded-xl text-xs text-gray-500 space-y-1.5">
+                      <p className="font-bold text-gray-400 mb-2">Syarat Password:</p>
+                      <p>• Minimal 6 karakter</p>
+                      <p>• Gunakan kombinasi huruf, angka, dan simbol</p>
+                      <p>• Jangan gunakan kata sandi yang sama dengan sebelumnya</p>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={isPasswordSubmitting}
+                        className="flex items-center gap-2 px-8 py-3 bg-[#ef6c00] text-white font-bold rounded-xl hover:bg-[#f57c00] shadow-lg shadow-[#ef6c00]/20 transition disabled:opacity-50"
+                      >
+                        <Save className="w-4 h-4" />
+                        Simpan Password
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          ) : activeTab === "notification" ? (
+            <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden">
+              <div className="p-6 border-b border-[#3b3127] bg-[#3b3127]/20">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-[#ef6c00]" /> Pengaturan Notifikasi
+                </h3>
+                <p className="text-gray-400 text-xs mt-1">Atur saluran dan jenis notifikasi yang ingin Anda terima.</p>
+              </div>
+
+              <div className="p-8 space-y-8">
+                {/* Email Notifications */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 border-b border-[#3b3127] pb-3">
+                    <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
+                      <Mail className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Notifikasi Email</p>
+                      <p className="text-[11px] text-gray-500">Kirim notifikasi melalui alamat email terdaftar.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { key: "emailNewSiswa", label: "Siswa Baru Terdaftar", desc: "Terima notifikasi setiap ada siswa baru yang mendaftar." },
+                      { key: "emailPayment", label: "Konfirmasi Pembayaran", desc: "Notifikasi saat ada pembayaran masuk yang berhasil." },
+                      { key: "emailWeeklyReport", label: "Laporan Mingguan", desc: "Ringkasan aktivitas platform setiap hari Senin." },
+                    ] as const).map(({ key, label, desc }) => (
+                      <div key={key} className="flex items-center justify-between p-4 bg-[#1f1a14] rounded-xl border border-[#3b3127]">
+                        <div>
+                          <p className="text-sm font-semibold text-white">{label}</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">{desc}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleNotif(key)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            notif[key] ? "bg-[#ef6c00]" : "bg-[#3b3127]"
+                          }`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                            notif[key] ? "translate-x-6" : "translate-x-1"
+                          }`} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* WhatsApp Notifications */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 border-b border-[#3b3127] pb-3">
+                    <div className="bg-green-500/10 p-2 rounded-lg border border-green-500/20">
+                      <MessageCircle className="w-4 h-4 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Notifikasi WhatsApp</p>
+                      <p className="text-[11px] text-gray-500">Kirim pesan otomatis via WhatsApp Gateway.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { key: "waScheduleReminder", label: "Pengingat Jadwal Kelas", desc: "Ingatkan siswa H-1 sebelum sesi dimulai." },
+                      { key: "waAttendance", label: "Notifikasi Kehadiran", desc: "Kirim recap absensi harian ke orang tua / siswa." },
+                      { key: "waPaymentGateway", label: "Konfirmasi Pembayaran WA", desc: "Notifikasi pembayaran langsung ke nomor siswa." },
+                    ] as const).map(({ key, label, desc }) => (
+                      <div key={key} className="flex items-center justify-between p-4 bg-[#1f1a14] rounded-xl border border-[#3b3127]">
+                        <div>
+                          <p className="text-sm font-semibold text-white">{label}</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">{desc}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleNotif(key)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            notif[key] ? "bg-[#ef6c00]" : "bg-[#3b3127]"
+                          }`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                            notif[key] ? "translate-x-6" : "translate-x-1"
+                          }`} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* In-App Notifications */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 border-b border-[#3b3127] pb-3">
+                    <div className="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
+                      <Bell className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Notifikasi In-App</p>
+                      <p className="text-[11px] text-gray-500">Tampilkan notifikasi di dalam dashboard aplikasi.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { key: "inAppSystem", label: "Aktivitas Sistem", desc: "Log kejadian penting seperti login gagal atau error." },
+                      { key: "inAppFeedback", label: "Komentar & Feedback", desc: "Notifikasi saat ada komentar baru di materi atau tugas." },
+                      { key: "inAppAnnouncement", label: "Pengumuman Admin", desc: "Tampilkan pengumuman yang dikirim oleh administrator." },
+                    ] as const).map(({ key, label, desc }) => (
+                      <div key={key} className="flex items-center justify-between p-4 bg-[#1f1a14] rounded-xl border border-[#3b3127]">
+                        <div>
+                          <p className="text-sm font-semibold text-white">{label}</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">{desc}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleNotif(key)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            notif[key] ? "bg-[#ef6c00]" : "bg-[#3b3127]"
+                          }`}
+                        >
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                            notif[key] ? "translate-x-6" : "translate-x-1"
+                          }`} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="pt-4 border-t border-[#3b3127] flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => toast.success("Preferensi notifikasi berhasil disimpan!")}
+                    className="flex items-center gap-2 px-8 py-3 bg-[#ef6c00] text-white font-bold rounded-xl hover:bg-[#f57c00] shadow-lg shadow-[#ef6c00]/20 transition"
+                  >
+                    <Save className="w-4 h-4" />
+                    Simpan Preferensi
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
         </div>
       </div>
