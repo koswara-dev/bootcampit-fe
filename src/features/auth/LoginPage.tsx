@@ -152,16 +152,6 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
-            
-            <div className="mt-6 pt-6 border-t border-[#3b3127] text-center">
-              <p className="text-sm text-gray-400 mb-4">Baru di bootcamp ini?</p>
-              <button
-                type="button"
-                className="w-full sm:w-auto inline-flex justify-center items-center py-2 px-6 border border-[#0ea5e9] text-[#0ea5e9] rounded-full hover:bg-[#0ea5e9]/10 transition text-sm font-medium"
-              >
-                Daftar Sekarang
-              </button>
-            </div>
           </form>
         </div>
       </div>
