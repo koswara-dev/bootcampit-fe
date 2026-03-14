@@ -5,6 +5,8 @@ import DashboardPage from "@/features/dashboard/DashboardPage";
 import ParticipantsPage from "@/features/participants/ParticipantsPage";
 import InterviewSchedulePage from "@/features/interviews/InterviewSchedulePage";
 import InterviewResultsPage from "@/features/evaluations/InterviewResultsPage";
+import CurriculumPage from "@/features/curriculum/CurriculumPage";
+import SettingsPage from "@/features/settings/SettingsPage";
 import NotFoundPage from "@/features/errors/NotFoundPage";
 import AccessDeniedPage from "@/features/errors/AccessDeniedPage";
 
@@ -19,8 +21,8 @@ export default function AppRouter() {
           <Route path="/participants" element={<ParticipantsPage />} />
           <Route path="/interviews" element={<InterviewSchedulePage />} />
           <Route path="/evaluations" element={<InterviewResultsPage />} />
-          <Route path="/curriculum" element={<div className="text-white p-8">Kurikulum</div>} />
-          <Route path="/settings" element={<div className="text-white p-8">Pengaturan</div>} />
+          <Route path="/curriculum" element={<CurriculumPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/403" element={<AccessDeniedPage />} />
         </Route>
         

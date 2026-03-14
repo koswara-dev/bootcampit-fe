@@ -15,11 +15,11 @@ interface Interview {
 }
 
 const mockInterviews: Interview[] = [
-  { id: '1', candidateName: 'Alex Johnson', interviewerName: 'Marcus Chen', type: 'Teknis', dateTime: '14 Maret 2024, 10:00 WIB', status: 'Mendatang' },
-  { id: '2', candidateName: 'Maria Garcia', interviewerName: 'Sarah Smith', type: 'HR', dateTime: '14 Maret 2024, 13:00 WIB', status: 'Mendatang' },
-  { id: '3', candidateName: 'James Smith', interviewerName: 'Marcus Chen', type: 'Teknis', dateTime: '13 Maret 2024, 09:00 WIB', status: 'Selesai' },
-  { id: '4', candidateName: 'Sarah Connor', interviewerName: 'Sarah Smith', type: 'User', dateTime: '15 Maret 2024, 15:00 WIB', status: 'Mendatang' },
-  { id: '5', candidateName: 'Chen Wei', interviewerName: 'David Lee', type: 'Teknis', dateTime: '12 Maret 2024, 11:00 WIB', status: 'Dibatalkan' },
+  { id: '1', candidateName: 'Alex Johnson', interviewerName: 'Marcus Chen', type: 'Teknis', dateTime: '14 Maret 2026, 10:00 WIB', status: 'Mendatang' },
+  { id: '2', candidateName: 'Maria Garcia', interviewerName: 'Sarah Smith', type: 'HR', dateTime: '14 Maret 2026, 13:00 WIB', status: 'Mendatang' },
+  { id: '3', candidateName: 'James Smith', interviewerName: 'Marcus Chen', type: 'Teknis', dateTime: '13 Maret 2026, 09:00 WIB', status: 'Selesai' },
+  { id: '4', candidateName: 'Sarah Connor', interviewerName: 'Sarah Smith', type: 'User', dateTime: '15 Maret 2026, 15:00 WIB', status: 'Mendatang' },
+  { id: '5', candidateName: 'Chen Wei', interviewerName: 'David Lee', type: 'Teknis', dateTime: '12 Maret 2026, 11:00 WIB', status: 'Dibatalkan' },
 ];
 
 export default function InterviewSchedulePage() {

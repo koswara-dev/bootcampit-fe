@@ -16,11 +16,11 @@ interface Participant {
 }
 
 const mockParticipants: Participant[] = [
-  { id: '1', name: 'Alex Johnson', status: 'Aktif', email: 'alex.j@techflow.io', regDate: '12 Okt 2023', phoneNumber: '08123456789', address: 'Jakarta Selatan', cohort: 'Quantum' },
-  { id: '2', name: 'Maria Garcia', status: 'Lulus', email: 'm.garcia@gmail.com', regDate: '24 Agu 2023', phoneNumber: '08123456789', address: 'Bandung', cohort: 'Quantum' },
-  { id: '3', name: 'James Smith', status: 'Aktif', email: 'jsmith@outlook.com', regDate: '02 Nov 2023', phoneNumber: '08123456789', address: 'Surabaya', cohort: 'Nebula' },
-  { id: '4', name: 'Sarah Connor', status: 'Keluar', email: 'sarah.c@tech.edu', regDate: '15 Sep 2023', phoneNumber: '08123456789', address: 'Medan', cohort: 'Quantum' },
-  { id: '5', name: 'Chen Wei', status: 'Lulus', email: 'c.wei@global.cn', regDate: '18 Jul 2023', phoneNumber: '08123456789', address: 'Semarang', cohort: 'Nebula' },
+  { id: '1', name: 'Alex Johnson', status: 'Aktif', email: 'alex.j@techflow.io', regDate: '12 Okt 2025', phoneNumber: '08123456789', address: 'Jakarta Selatan', cohort: 'Quantum' },
+  { id: '2', name: 'Maria Garcia', status: 'Lulus', email: 'm.garcia@gmail.com', regDate: '24 Agu 2025', phoneNumber: '08123456789', address: 'Bandung', cohort: 'Quantum' },
+  { id: '3', name: 'James Smith', status: 'Aktif', email: 'jsmith@outlook.com', regDate: '02 Nov 2025', phoneNumber: '08123456789', address: 'Surabaya', cohort: 'Nebula' },
+  { id: '4', name: 'Sarah Connor', status: 'Keluar', email: 'sarah.c@tech.edu', regDate: '15 Sep 2025', phoneNumber: '08123456789', address: 'Medan', cohort: 'Quantum' },
+  { id: '5', name: 'Chen Wei', status: 'Lulus', email: 'c.wei@global.cn', regDate: '18 Jul 2025', phoneNumber: '08123456789', address: 'Semarang', cohort: 'Nebula' },
 ];
 
 export default function ParticipantsPage() {
