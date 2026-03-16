@@ -1,5 +1,6 @@
 import { Users, MessagesSquare, CheckSquare, Calendar, Award, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useAuthStore } from "@/app/store/auth.store";
+import { Link } from "react-router-dom";
 
 export default function DashboardPage() {
   const user = useAuthStore(state => state.user);
@@ -16,12 +17,16 @@ export default function DashboardPage() {
             Siswa Anda membuat kemajuan luar biasa hari ini. Anda memiliki {user?.role === "ADMIN" ? "3 wawancara yang dimulai dalam satu jam ke depan" : "kampanye pemasaran baru yang siap diluncurkan"}.
           </p>
           <div className="flex gap-4">
-            <button className="bg-white text-[#ef6c00] px-6 py-3 rounded-lg font-bold shadow-md hover:bg-[#fff3e0] transition">
-              Lihat Jadwal
-            </button>
-            <button className="bg-transparent border-2 border-white/30 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition">
-              Laporan Cepat
-            </button>
+            <Link to="/interviews">
+              <button className="bg-white text-[#ef6c00] px-6 py-3 rounded-lg font-bold shadow-md hover:bg-[#fff3e0] transition">
+                Lihat Jadwal
+              </button>
+            </Link>
+            <Link to="/evaluations">
+              <button className="bg-transparent border-2 border-white/30 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition">
+                Laporan Cepat
+              </button>
+            </Link>
           </div>
         </div>
       </div>

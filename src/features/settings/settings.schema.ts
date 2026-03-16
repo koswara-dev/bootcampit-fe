@@ -23,6 +23,8 @@ export const integrationSchema = z.object({
   whatsappSenderNum: z.string().min(1, "Nomor pengirim wajib diisi"),
   geminiApiKey: z.string().min(1, "API Key Gemini wajib diisi"),
   geminiModel: z.string().min(1, "Model Gemini wajib diisi"),
+  emailTo: z.string().email("Email tujuan tidak valid").min(1, "Email tujuan wajib diisi"),
+  emailCc: z.string().email("Email CC tidak valid").optional().or(z.literal("")),
 });
 
 export const passwordSchema = z.object({

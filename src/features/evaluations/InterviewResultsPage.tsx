@@ -12,14 +12,15 @@ interface Evaluation {
   lastEvaluator: string;
   date: string;
   feedback?: string;
+  emailSent: boolean;
 }
 
 const mockEvaluations: Evaluation[] = [
-  { id: '1', candidateName: 'Alex Johnson', avgScore: 88, status: 'Lolos', lastEvaluator: 'Marcus Chen', date: '12 Mar 2026' },
-  { id: '2', candidateName: 'Maria Garcia', avgScore: 92, status: 'Lolos', lastEvaluator: 'Sarah Smith', date: '11 Mar 2026' },
-  { id: '3', candidateName: 'James Smith', avgScore: 45, status: 'Tidak Lolos', lastEvaluator: 'Marcus Chen', date: '10 Mar 2026' },
-  { id: '4', candidateName: 'Sarah Connor', avgScore: 0, status: 'Menunggu', lastEvaluator: '-', date: '13 Mar 2026' },
-  { id: '5', candidateName: 'Chen Wei', avgScore: 78, status: 'Lolos', lastEvaluator: 'David Lee', date: '09 Mar 2026' },
+  { id: '1', candidateName: 'Alex Johnson', avgScore: 88, status: 'Lolos', lastEvaluator: 'Marcus Chen', date: '12 Mar 2026', emailSent: true },
+  { id: '2', candidateName: 'Maria Garcia', avgScore: 92, status: 'Lolos', lastEvaluator: 'Sarah Smith', date: '11 Mar 2026', emailSent: true },
+  { id: '3', candidateName: 'James Smith', avgScore: 45, status: 'Tidak Lolos', lastEvaluator: 'Marcus Chen', date: '10 Mar 2026', emailSent: false },
+  { id: '4', candidateName: 'Sarah Connor', avgScore: 0, status: 'Menunggu', lastEvaluator: '-', date: '13 Mar 2026', emailSent: false },
+  { id: '5', candidateName: 'Chen Wei', avgScore: 78, status: 'Lolos', lastEvaluator: 'David Lee', date: '09 Mar 2026', emailSent: true },
 ];
 
 export default function InterviewResultsPage() {
@@ -155,18 +156,26 @@ export default function InterviewResultsPage() {
               </div>
               <div className="text-right">
                  <p className="text-gray-500 text-[10px] font-medium mb-1">{evaluation.date}</p>
-                 <button className="text-[#ef6c00] text-xs font-bold hover:underline flex items-center gap-1 justify-end transition">
+                <button className="text-[#ef6c00] text-xs font-bold hover:underline flex items-center gap-1 justify-end transition">
                     Rincian <ChevronRight className="w-3 h-3" />
                  </button>
               </div>
             </div>
 
-            {evaluation.status === 'Lolos' && (
-               <div className="mt-6 pt-6 border-t border-[#3b3127] flex items-center gap-2 relative z-10">
-                  <Trophy className="w-4 h-4 text-yellow-500" />
-                  <span className="text-xs text-yellow-500/80 font-semibold tracking-wide">Direkomendasikan Lanjut</span>
-               </div>
-            )}
+            <div className="mt-4 pt-4 border-t border-[#3b3127] flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${evaluation.emailSent ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-gray-600'}`}></div>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${evaluation.emailSent ? 'text-green-500' : 'text-gray-500'}`}>
+                  {evaluation.emailSent ? 'Email Terkirim' : 'Email Pending'}
+                </span>
+              </div>
+              {evaluation.status === 'Lolos' && (
+                 <div className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                    <span className="text-[10px] text-yellow-500/80 font-bold uppercase tracking-wider">Recommended</span>
+                 </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

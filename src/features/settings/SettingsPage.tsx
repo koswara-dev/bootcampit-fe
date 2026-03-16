@@ -75,7 +75,9 @@ export default function SettingsPage() {
       whatsappApiKey: "",
       whatsappSenderNum: "",
       geminiApiKey: "",
-      geminiModel: "gemini-pro"
+      geminiModel: "gemini-pro",
+      emailTo: "admin@bootcampit.com",
+      emailCc: "info@bootcampit.com"
     },
   });
 
@@ -441,6 +443,25 @@ export default function SettingsPage() {
                         <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                       </select>
                       {integrationErrors.geminiModel && <p className="text-red-500 text-xs">{integrationErrors.geminiModel.message}</p>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email Routing Notifications */}
+                <div className="space-y-4">
+                  <h4 className="text-white font-semibold flex items-center gap-2 border-b border-[#3b3127] pb-2">
+                    <Mail className="w-5 h-5 text-orange-400" /> Routing Email Notifikasi
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-400">Kirim Email Ke</label>
+                      <input {...regIntegration("emailTo")} disabled={!isAdmin} className="w-full bg-[#1f1a14] border border-[#3b3127] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#ef6c00] transition disabled:opacity-50" placeholder="admin@example.com" />
+                      {integrationErrors.emailTo && <p className="text-red-500 text-xs">{integrationErrors.emailTo.message}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-gray-400">Email CC</label>
+                      <input {...regIntegration("emailCc")} disabled={!isAdmin} className="w-full bg-[#1f1a14] border border-[#3b3127] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#ef6c00] transition disabled:opacity-50" placeholder="cc@example.com" />
+                      {integrationErrors.emailCc && <p className="text-red-500 text-xs">{integrationErrors.emailCc.message}</p>}
                     </div>
                   </div>
                 </div>
