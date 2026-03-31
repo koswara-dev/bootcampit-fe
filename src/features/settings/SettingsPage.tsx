@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Settings, Save, Lock, Bell, Globe, Database, ShieldCheck, Mail, Camera, Link, MessageCircle, Bot, AtSign, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Settings, Save, Lock, Bell, Globe, Database, ShieldCheck, Mail, Camera, Link, MessageCircle, Bot, AtSign, KeyRound, Eye, EyeOff, Sun, Moon, Type, Monitor, CheckCircle } from "lucide-react";
 import { useAuthStore } from "@/app/store/auth.store";
 import { profileSchema, systemSchema, integrationSchema, passwordSchema } from "./settings.schema";
 import type { ProfileFormValues, SystemFormValues, IntegrationFormValues, PasswordFormValues } from "./settings.schema";
 import toast from "react-hot-toast";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function SettingsPage() {
   const user = useAuthStore((state) => state.user);
-  const [activeTab, setActiveTab] = useState<"profile" | "system" | "integration" | "security" | "notification">("profile");
+  const { theme, fontSize, setTheme, setFontSize } = useSettingsStore();
+
+  const [activeTab, setActiveTab] = useState<"profile" | "system" | "integration" | "security" | "notification" | "display">("profile");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  
   // Notification toggles
   const [notif, setNotif] = useState({
     emailNewSiswa: true,
@@ -30,140 +33,112 @@ export default function SettingsPage() {
     setNotif((prev) => ({ ...prev, [key]: !prev[key] }));
   const isAdmin = user?.role === "ADMIN";
 
-  // Profile Form
-  const {
-    register: regProfile,
-    handleSubmit: handleProfileSubmit,
-    formState: { errors: profileErrors, isSubmitting: isProfileSubmitting },
-  } = useForm<ProfileFormValues>({
+  // Forms
+  const { register: regProfile, handleSubmit: handleProfileSubmit, formState: { errors: profileErrors, isSubmitting: isProfileSubmitting } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
-      avatar: user?.avatar || "",
-    },
+    defaultValues: { name: user?.name || "", email: user?.email || "", avatar: user?.avatar || "" }
   });
 
-  // System Form
-  const {
-    register: regSystem,
-    handleSubmit: handleSystemSubmit,
-    formState: { isSubmitting: isSystemSubmitting },
-  } = useForm<SystemFormValues>({
+  const { register: regSystem, handleSubmit: handleSystemSubmit, formState: { isSubmitting: isSystemSubmitting } } = useForm<SystemFormValues>({
     resolver: zodResolver(systemSchema),
-    defaultValues: {
-      appName: "IT Bootcamp Academy",
-      maintenanceMode: false,
-      registrationEnabled: true,
-      maxStudentsPerCohort: 50,
-      defaultCurrency: "IDR",
-    },
+    defaultValues: { appName: "IT Bootcamp Academy", maintenanceMode: false, registrationEnabled: true, maxStudentsPerCohort: 50, defaultCurrency: "IDR" }
   });
 
-  // Integration Form
-  const {
-    register: regIntegration,
-    handleSubmit: handleIntegrationSubmit,
-    formState: { errors: integrationErrors, isSubmitting: isIntegrationSubmitting },
-  } = useForm<IntegrationFormValues>({
-    resolver: zodResolver(integrationSchema),
-    defaultValues: {
-      smtpHost: "",
-      smtpPort: 2525,
-      smtpUser: "",
-      smtpPass: "",
-      whatsappApiKey: "",
-      whatsappSenderNum: "",
-      geminiApiKey: "",
-      geminiModel: "gemini-pro",
-      emailTo: "admin@bootcampit.com",
-      emailCc: "info@bootcampit.com"
-    },
+  const { register: regIntegration, handleSubmit: handleIntegrationSubmit, formState: { errors: integrationErrors, isSubmitting: isIntegrationSubmitting } } = useForm<IntegrationFormValues>({
+    resolver: zodResolver(integrationSchema)
   });
 
-  // Password Form
-  const {
-    register: regPassword,
-    handleSubmit: handlePasswordSubmit,
-    reset: resetPassword,
-    formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
-  } = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
+  const { register: regPassword, handleSubmit: handlePasswordSubmit, reset: resetPassword, formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting } } = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema)
   });
 
-
-  const onProfileSave = (data: ProfileFormValues) => {
-    console.log("Profile data saved:", data);
-    toast.success("Profil Anda berhasil diperbarui!");
-  };
-
-  const onSystemSave = (data: SystemFormValues) => {
-    if (!isAdmin) {
-      toast.error("Hanya Admin yang dapat mengubah pengaturan sistem.");
-      return;
-    }
-    console.log("System data saved:", data);
-    toast.success("Pengaturan sistem berhasil disimpan!");
-  };
-
-  const onIntegrationSave = (data: IntegrationFormValues) => {
-    if (!isAdmin) {
-      toast.error("Hanya Admin yang dapat mengubah integrasi API.");
-      return;
-    }
-    console.log("Integration data saved:", data);
-    toast.success("Pengaturan integrasi API berhasil disimpan!");
-  };
-
-  const onPasswordSave = (data: PasswordFormValues) => {
-    console.log("Password change submitted:", data);
-    toast.success("Password berhasil diubah!");
-    resetPassword();
-  };
+  const onProfileSave = () => { toast.success("Profil Anda berhasil diperbarui!"); };
+  const onSystemSave = () => { toast.success("Pengaturan sistem berhasil disimpan!"); };
+  const onIntegrationSave = () => { toast.success("Integrasi API berhasil disimpan!"); };
+  const onPasswordSave = () => { toast.success("Password berhasil diubah!"); resetPassword(); };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto py-8 px-4">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Pengaturan</h1>
+        <h1 className="text-3xl font-black text-white dark:text-white light:text-gray-900 mb-2">Pengaturan</h1>
         <p className="text-gray-400 text-sm">
-          Kelola preferensi akun dan konfigurasi sistem aplikasi.
+          Kelola preferensi akun, konfigurasi sistem, dan tampilan aplikasi.
         </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Nav Settings */}
-        <div className="w-full lg:w-64 space-y-2">
+        <div className="w-full lg:w-72 space-y-2">
           <button
             onClick={() => setActiveTab("profile")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
               activeTab === "profile"
-                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
-                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
             }`}
           >
             <User className="w-5 h-5" />
             Profil Saya
           </button>
+          
+          <button
+            onClick={() => setActiveTab("display")}
+            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
+              activeTab === "display"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
+            }`}
+          >
+            <Monitor className="w-5 h-5" />
+            Tampilan App
+          </button>
+
+          <button
+            onClick={() => setActiveTab("notification")}
+            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
+              activeTab === "notification"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
+            }`}
+          >
+            <Bell className="w-5 h-5" />
+            Notifikasi
+          </button>
+
+          <button
+            onClick={() => setActiveTab("security")}
+            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
+              activeTab === "security"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
+            }`}
+          >
+            <ShieldCheck className="w-5 h-5" />
+            Keamanan
+          </button>
+
+          <div className="h-px bg-[#3b3127] my-6 mx-4"></div>
+
           <button
             onClick={() => setActiveTab("system")}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
               activeTab === "system"
-                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
-                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
             }`}
           >
             <div className="flex items-center gap-3">
               <Settings className="w-5 h-5" />
-              Pengaturan Sistem
+              Sistem Global
             </div>
             {!isAdmin && <Lock className="w-3.5 h-3.5 opacity-50" />}
           </button>
           <button
             onClick={() => setActiveTab("integration")}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold transition-all border ${
               activeTab === "integration"
-                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
-                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
+                ? "bg-[#ef6c00] border-[#ef6c00] text-white shadow-xl shadow-[#ef6c00]/30 scale-[1.02]"
+                : "text-gray-400 border-transparent hover:bg-[#29221b] hover:text-white"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -171,31 +146,6 @@ export default function SettingsPage() {
               Integrasi API
             </div>
             {!isAdmin && <Lock className="w-3.5 h-3.5 opacity-50" />}
-          </button>
-          
-          <div className="h-px bg-[#3b3127] my-4 mx-4"></div>
-          
-          <button
-            onClick={() => setActiveTab("notification")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-              activeTab === "notification"
-                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
-                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
-            }`}
-          >
-            <Bell className="w-5 h-5" />
-            Notifikasi
-          </button>
-          <button
-            onClick={() => setActiveTab("security")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-              activeTab === "security"
-                ? "bg-[#ef6c00] text-white shadow-lg shadow-[#ef6c00]/20"
-                : "text-gray-400 hover:text-white hover:bg-[#29221b]"
-            }`}
-          >
-            <ShieldCheck className="w-5 h-5" />
-            Keamanan
           </button>
         </div>
 
@@ -708,6 +658,112 @@ export default function SettingsPage() {
                   >
                     <Save className="w-4 h-4" />
                     Simpan Preferensi
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : activeTab === "display" ? (
+            <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-6 border-b border-[#3b3127] bg-[#3b3127]/20">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Monitor className="w-5 h-5 text-[#ef6c00]" /> Tampilan & Antarmuka
+                </h3>
+                <p className="text-gray-400 text-xs mt-1">Personalisasi pengalaman visual Anda di platform.</p>
+              </div>
+
+              <div className="p-10 space-y-12">
+                {/* Theme Selection */}
+                <div className="space-y-6">
+                  <h4 className="text-white font-bold flex items-center gap-3">
+                    <Sun className="w-5 h-5 text-yellow-500" />
+                    Pilih Tema Aplikasi
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setTheme("dark")}
+                      className={`relative flex items-center gap-4 p-6 rounded-3xl border-2 transition-all ${
+                        theme === "dark" 
+                          ? "bg-[#1f1a14] border-[#ef6c00] ring-4 ring-[#ef6c00]/10" 
+                          : "bg-[#1f1a14] border-[#3b3127] hover:border-gray-500"
+                      }`}
+                    >
+                      <div className="bg-gray-800 p-3 rounded-2xl">
+                        <Moon className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white font-bold">Dark Mode</p>
+                        <p className="text-gray-500 text-xs">Nyaman untuk mata di malam hari.</p>
+                      </div>
+                      {theme === "dark" && <div className="absolute top-4 right-4 w-3 h-3 bg-[#ef6c00] rounded-full animate-pulse"></div>}
+                    </button>
+
+                    <button
+                      onClick={() => setTheme("light")}
+                      className={`relative flex items-center gap-4 p-6 rounded-3xl border-2 transition-all ${
+                        theme === "light" 
+                          ? "bg-white border-[#ef6c00] ring-4 ring-[#ef6c00]/10" 
+                          : "bg-gray-100 border-gray-200 hover:border-gray-400"
+                      }`}
+                    >
+                      <div className="bg-orange-100 p-3 rounded-2xl">
+                        <Sun className="w-6 h-6 text-orange-500" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-gray-900 font-bold">Light Mode</p>
+                        <p className="text-gray-500 text-xs">Tampilan bersih dan terang.</p>
+                      </div>
+                      {theme === "light" && <div className="absolute top-4 right-4 w-3 h-3 bg-[#ef6c00] rounded-full animate-pulse"></div>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Font Size Selection */}
+                <div className="space-y-6">
+                  <h4 className="text-white font-bold flex items-center gap-3">
+                    <Type className="w-5 h-5 text-purple-400" />
+                    Ukuran Font Global
+                  </h4>
+                  <div className="bg-[#1f1a14] p-8 rounded-[2.5rem] border border-[#3b3127]">
+                    <div className="grid grid-cols-3 gap-4">
+                      {([
+                        { id: "very-small", label: "Very Small", size: "text-xs" },
+                        { id: "small", label: "Small (Default)", size: "text-sm" },
+                        { id: "medium", label: "Medium", size: "text-base" },
+                      ] as const).map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => setFontSize(opt.id)}
+                          className={`flex flex-col items-center gap-3 p-6 rounded-3xl border-2 transition-all ${
+                            fontSize === opt.id 
+                              ? "bg-[#ef6c00]/10 border-[#ef6c00] shadow-lg" 
+                              : "bg-[#29221b] border-[#3b3127] hover:border-gray-500"
+                          }`}
+                        >
+                          <span className={`text-white font-black ${opt.size}`}>Aa</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            {opt.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-8 p-6 bg-[#29221b] rounded-2xl border border-dashed border-[#3b3127]">
+                       <p className="text-gray-500 text-[10px] font-bold uppercase mb-2">Preview Teks</p>
+                       <p className={`text-gray-300 leading-relaxed font-medium transition-all ${
+                         fontSize === "very-small" ? "text-xs" : fontSize === "small" ? "text-sm" : "text-base"
+                       }`}>
+                         "Pendidikan adalah senjata paling ampuh yang bisa Anda gunakan untuk mengubah dunia." – Nelson Mandela
+                       </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-[#3b3127] flex justify-end">
+                   <button
+                    onClick={() => toast.success("Pengaturan tampilan disimpan secara otomatis!")}
+                    className="flex items-center gap-2 px-8 py-3 bg-[#3b3127] text-white font-bold rounded-xl hover:bg-[#4a3f33] transition"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Simpan Perubahan
                   </button>
                 </div>
               </div>

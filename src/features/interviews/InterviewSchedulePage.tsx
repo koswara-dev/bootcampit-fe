@@ -1,6 +1,8 @@
-import { Plus, Download, Calendar, ChevronLeft, ChevronRight, Clock, Video, Edit } from "lucide-react";
+import { Plus, Download, Calendar, Clock, Video, Edit, ClipboardList } from "lucide-react";
+import DataTable from "../../components/ui/DataTable";
 import { useState } from "react";
 import InterviewForm from "./InterviewForm";
+import InterviewModal from "./InterviewModal";
 import type { InterviewFormValues } from "./interview.schema";
 import toast from "react-hot-toast";
 
@@ -22,9 +24,20 @@ const mockInterviews: Interview[] = [
   { id: '5', candidateName: 'Chen Wei', interviewerName: 'David Lee', type: 'Teknis', dateTime: '12 Maret 2026, 11:00 WIB', status: 'Dibatalkan' },
 ];
 
+const COLUMN_LABELS: Record<string, string> = {
+  candidateName: "Nama Kandidat",
+  interviewerName: "Pewawancara",
+  type: "Tipe & Waktu",
+  status: "Status",
+  notes: "Catatan",
+  actions: "Aksi",
+};
+
 export default function InterviewSchedulePage() {
   const [activeTab, setActiveTab] = useState('Semua Jadwal');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const [editingInterview, setEditingInterview] = useState<InterviewFormValues | null>(null);
 
   const tabs = ['Semua Jadwal', 'Mendatang', 'Selesai', 'Dibatalkan'];
@@ -57,6 +70,11 @@ export default function InterviewSchedulePage() {
       notes: interview.notes || "",
     });
     setIsFormOpen(true);
+  };
+
+  const handleStartInterview = (candidateName: string) => {
+    setSelectedCandidate(candidateName);
+    setIsInterviewModalOpen(true);
   };
 
   const handleFormSubmit = (data: InterviewFormValues) => {
@@ -106,82 +124,80 @@ export default function InterviewSchedulePage() {
         ))}
       </div>
 
-      <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#3b3127]">
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Kandidat</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Pewawancara</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Tipe & Waktu</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#3b3127]">
-              {mockInterviews.map((interview) => (
-                <tr key={interview.id} className="hover:bg-[#3b3127]/30 transition group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-[#1f1a14] p-2 rounded-lg border border-[#3b3127]">
-                        <Calendar className="w-4 h-4 text-[#ef6c00]" />
-                      </div>
-                      <span className="text-white font-medium">{interview.candidateName}</span>
+      <DataTable
+        tableId="interviews-table"
+        columns={(Object.keys(COLUMN_LABELS) as Array<keyof typeof COLUMN_LABELS>).map((key) => ({
+          header: COLUMN_LABELS[key],
+          key: key,
+          canHide: !["candidateName", "actions"].includes(key),
+          align: key === "actions" ? "right" : "left",
+          render: (interview: Interview) => {
+            switch (key) {
+              case "candidateName":
+                return (
+                  <div className="flex items-center gap-3">
+                    <div className="bg-[#1f1a14] p-2 rounded-lg border border-[#3b3127]">
+                      <Calendar className="w-4 h-4 text-[#ef6c00]" />
                     </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="text-gray-300 text-sm font-medium">{interview.interviewerName}</span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-bold text-[#ef6c00] uppercase tracking-wider">{interview.type}</span>
-                      <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                        <Clock className="w-3.5 h-3.5" />
-                        {interview.dateTime}
-                      </div>
+                    <span className="text-white font-medium">{interview.candidateName}</span>
+                  </div>
+                );
+              case "interviewerName":
+                return <span className="text-gray-300 text-sm font-medium">{interview.interviewerName}</span>;
+              case "type":
+                return (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-bold text-[#ef6c00] uppercase tracking-wider">{interview.type}</span>
+                    <div className="flex items-center gap-1.5 text-gray-400 text-sm">
+                      <Clock className="w-3.5 h-3.5" />
+                      {interview.dateTime}
                     </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${getStatusStyles(interview.status)}`}>
-                      {interview.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center justify-end gap-2">
-                       <button className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-xs font-semibold transition bg-blue-400/10 px-3 py-1.5 rounded-lg">
-                        <Video className="w-4 h-4" />
-                        Join
-                      </button>
-                      <button 
-                        onClick={() => handleOpenEditForm(interview)}
-                        className="text-gray-400 hover:text-white p-2 hover:bg-[#3b3127] rounded-lg transition"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="px-8 py-6 border-t border-[#3b3127] flex items-center justify-between">
-          <p className="text-sm text-gray-500">
-            Menampilkan <span className="text-white font-medium">1 sampai 5</span> dari <span className="text-white font-medium">12</span> jadwal
-          </p>
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-gray-500 hover:text-white transition border border-[#3b3127] rounded-lg">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#ef6c00] text-white text-sm font-bold">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#3b3127] text-sm font-bold transition">2</button>
-            <button className="p-2 text-gray-500 hover:text-white transition border border-[#3b3127] rounded-lg">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
+                  </div>
+                );
+              case "status":
+                return (
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${getStatusStyles(interview.status)}`}>
+                    {interview.status}
+                  </span>
+                );
+              case "notes":
+                return <span className="text-gray-400 text-sm max-w-xs truncate block">{interview.notes || "-"}</span>;
+              case "actions":
+                return (
+                  <div className="flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => handleStartInterview(interview.candidateName)}
+                      className="text-[#ef6c00] hover:text-white flex items-center gap-1.5 text-xs font-bold transition bg-[#ef6c00]/10 hover:bg-[#ef6c00] px-3 py-2 rounded-lg border border-[#ef6c00]/20"
+                    >
+                      <ClipboardList className="w-4 h-4" />
+                      Interview
+                    </button>
+                    <button className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-xs font-semibold transition bg-blue-400/10 px-3 py-2 rounded-lg border border-blue-400/10">
+                      <Video className="w-4 h-4" />
+                      Join
+                    </button>
+                    <button 
+                      onClick={() => handleOpenEditForm(interview)}
+                      className="text-gray-400 hover:text-white p-2 hover:bg-[#3b3127] rounded-lg transition"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                  </div>
+                );
+              default:
+                return null;
+            }
+          }
+        }))}
+        data={mockInterviews}
+        pagination={{
+            currentPage: 1,
+            totalPages: 3,
+            pageSize: 5,
+            totalItems: 12,
+            onPageChange: (page: number) => console.log("Page changed to:", page)
+        }}
+      />
 
       <InterviewForm 
         isOpen={isFormOpen}
@@ -189,6 +205,12 @@ export default function InterviewSchedulePage() {
         onSubmit={handleFormSubmit}
         initialData={editingInterview}
         title={editingInterview ? "Perbarui Jadwal" : "Atur Jadwal Baru"}
+      />
+
+      <InterviewModal 
+        isOpen={isInterviewModalOpen}
+        onClose={() => setIsInterviewModalOpen(false)}
+        candidateName={selectedCandidate}
       />
     </div>
   );

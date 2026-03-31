@@ -1,4 +1,5 @@
-import { Plus, Download, Edit, ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
+import { Plus, Download, Edit, UserPlus } from "lucide-react";
+import DataTable from "../../components/ui/DataTable";
 import { useState } from "react";
 import ParticipantForm from "./ParticipantForm";
 import type { ParticipantFormValues } from "./participant.schema";
@@ -22,6 +23,17 @@ const mockParticipants: Participant[] = [
   { id: '4', name: 'Sarah Connor', status: 'Keluar', email: 'sarah.c@tech.edu', regDate: '15 Sep 2025', phoneNumber: '08123456789', address: 'Medan', cohort: 'Quantum' },
   { id: '5', name: 'Chen Wei', status: 'Lulus', email: 'c.wei@global.cn', regDate: '18 Jul 2025', phoneNumber: '08123456789', address: 'Semarang', cohort: 'Nebula' },
 ];
+
+const COLUMN_LABELS: Record<string, string> = {
+  name: "Nama Lengkap",
+  status: "Status",
+  email: "Alamat Email",
+  regDate: "Tgl. Daftar",
+  phoneNumber: "No. Telepon",
+  address: "Alamat",
+  cohort: "Kohort",
+  actions: "Aksi",
+};
 
 export default function ParticipantsPage() {
   const [activeTab, setActiveTab] = useState('Semua Kandidat');
@@ -108,73 +120,59 @@ export default function ParticipantsPage() {
         ))}
       </div>
 
-      <div className="bg-[#29221b] rounded-2xl border border-[#3b3127] shadow-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#3b3127]">
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Lengkap</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat Email</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Tgl. Daftar</th>
-                <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#3b3127]">
-              {mockParticipants.map((participant) => (
-                <tr key={participant.id} className="hover:bg-[#3b3127]/30 transition group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold bg-[#1f1a14] border border-[#3b3127] text-white`}>
-                        {participant.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <span className="text-white font-medium">{participant.name}</span>
+      <DataTable
+        tableId="participants-table"
+        columns={(Object.keys(COLUMN_LABELS) as Array<keyof typeof COLUMN_LABELS>).map((key) => ({
+          header: COLUMN_LABELS[key],
+          key: key,
+          canHide: !["name", "actions"].includes(key),
+          align: key === "actions" ? "right" : "left",
+          render: (participant: Participant) => {
+            switch (key) {
+              case "name":
+                return (
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold bg-[#1f1a14] border border-[#3b3127] text-white`}>
+                      {participant.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${getStatusStyles(participant.status)}`}>
-                      {participant.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="text-gray-400 text-sm">{participant.email}</span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="text-gray-400 text-sm font-medium">{participant.regDate}</span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button 
-                      onClick={() => handleOpenEditForm(participant)}
-                      className="text-[#ef6c00] hover:text-[#f57c00] p-2 hover:bg-[#ef6c00]/10 rounded-lg transition"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="px-8 py-6 border-t border-[#3b3127] flex items-center justify-between">
-          <p className="text-sm text-gray-500">
-            Menampilkan <span className="text-white font-medium">1 sampai 5</span> dari <span className="text-white font-medium">42</span> kandidat
-          </p>
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-gray-500 hover:text-white transition disabled:opacity-20 border border-[#3b3127] rounded-lg">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#ef6c00] text-white text-sm font-bold">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#3b3127] hover:text-white transition text-sm font-bold">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#3b3127] hover:text-white transition text-sm font-bold">3</button>
-            <span className="text-gray-500 px-2">...</span>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-[#3b3127] hover:text-white transition text-sm font-bold">9</button>
-            <button className="p-2 text-gray-500 hover:text-white transition border border-[#3b3127] rounded-lg">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
+                    <span className="text-white font-medium">{participant.name}</span>
+                  </div>
+                );
+              case "status":
+                return (
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${getStatusStyles(participant.status)}`}>
+                    {participant.status}
+                  </span>
+                );
+              case "actions":
+                return (
+                  <button 
+                    onClick={() => handleOpenEditForm(participant)}
+                    className="text-[#ef6c00] hover:text-[#f57c00] p-2 hover:bg-[#ef6c00]/10 rounded-lg transition"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                );
+              case "email":
+              case "regDate":
+              case "phoneNumber":
+              case "address":
+              case "cohort":
+                return <span className={`text-sm ${key === "regDate" ? "font-medium" : ""} text-gray-400`}>{participant[key] || "-"}</span>;
+              default:
+                return null;
+            }
+          }
+        }))}
+        data={mockParticipants}
+        pagination={{
+          currentPage: 1,
+          totalPages: 9,
+          pageSize: 5,
+          totalItems: 42,
+          onPageChange: (page: number) => console.log("Page changed to:", page)
+        }}
+      />
 
       <div className="bg-[#29221b]/50 border-2 border-dashed border-[#3b3127] rounded-3xl p-12 flex flex-col items-center justify-center text-center">
         <div className="bg-[#3b3127] p-4 rounded-2xl mb-4">
